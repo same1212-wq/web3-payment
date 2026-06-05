@@ -22,7 +22,7 @@ export async function POST(req: NextRequest) {
         {
           collectionLocator: `crossmint:${COLLECTION_ID}`,
           callData: {
-            totalPrice: totalPrice,
+            totalPrice: String(totalPrice),
             quantity: 1,
           },
         },
@@ -30,9 +30,11 @@ export async function POST(req: NextRequest) {
       recipient: {
         email: recipientEmail,
       },
+      locale: "ja-JP",
     }),
   });
 
   const data = await response.json();
+  console.log("Crossmint order response:", JSON.stringify(data?.order?.quote, null, 2));
   return NextResponse.json(data);
 }

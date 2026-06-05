@@ -104,7 +104,7 @@ export default function CheckoutPage() {
           <CrossmintProvider apiKey={CLIENT_API_KEY}>
             <CrossmintHostedCheckout
               lineItems={{
-                collectionId: COLLECTION_ID,
+                collectionLocator: `crossmint:${COLLECTION_ID}`,
                 callData: {
                   totalPrice: toUsdc(selected.priceJPY),
                   quantity: 1,

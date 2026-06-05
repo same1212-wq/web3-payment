@@ -10,7 +10,7 @@ const PLANS = [
   { id: "basic", name: "Basic Plan", priceJPY: 500000 },
 ];
 
-function PaymentForm({ clientSecret, onSuccess }: { clientSecret: string; onSuccess: () => void }) {
+function PaymentForm({ onSuccess }: { onSuccess: () => void }) {
   const stripe = useStripe();
   const elements = useElements();
   const [loading, setLoading] = useState(false);
@@ -103,12 +103,24 @@ export default function CheckoutPage() {
         }),
       });
       const data = await res.json();
-      if (data.payment?.stripePublishableKey && data.payment?.preparation?.stripeClientSecret) {
-        const stripe = loadStripe(data.payment.stripePublishableKey);
+
+      // レスポンス構造を柔軟に対応
+      const stripeKey =
+        data.payment?.stripePublishableKey ||
+        data.stripePublishableKey;
+
+      const secret =
+        data.payment?.preparation?.stripeClientSecret ||
+        data.payment?.clientSecret ||
+        data.clientSecret;
+
+      if (stripeKey && secret) {
+        const stripe = loadStripe(stripeKey);
         setStripePromise(stripe);
-        setClientSecret(data.payment.preparation.stripeClientSecret);
+        setClientSecret(secret);
       } else {
-        alert("Order creation failed: " + JSON.stringify(data));
+        console.error("Unexpected response:", JSON.stringify(data));
+        alert("Order creation failed. Please try again.\n\n" + JSON.stringify(data, null, 2));
       }
     } catch (e) {
       alert("Error: " + e);
@@ -121,7 +133,7 @@ export default function CheckoutPage() {
     return (
       <main style={{ maxWidth: "520px", margin: "60px auto", padding: "0 16px", fontFamily: "sans-serif", textAlign: "center" }}>
         <h1 style={{ fontSize: "24px", color: "#6366f1" }}>Payment Complete!</h1>
-        <p style={{ color: "#6b7280" }}>Thank you for your payment. Your NFT will be delivered shortly.</p>
+        <p style={{ color: "#6b7280" }}>Thank you. Your NFT will be delivered shortly.</p>
       </main>
     );
   }
@@ -204,8 +216,15 @@ export default function CheckoutPage() {
         </div>
       ) : (
         <div>
+          <div style={{ padding: "16px", border: "1px solid #e5e7eb", borderRadius: "12px", marginBottom: "16px", background: "#f9fafb" }}>
+            <div style={{ display: "flex", justifyContent: "space-between" }}>
+              <p style={{ fontWeight: 600, margin: 0 }}>{selected.name}</p>
+              <p style={{ fontWeight: 700, color: "#6366f1", margin: 0 }}>JPY {selected.priceJPY.toLocaleString()}</p>
+            </div>
+            <p style={{ fontSize: "11px", color: "#9ca3af", margin: "4px 0 0" }}>{`approx. ${toUsdc(selected.priceJPY)} USDC`}</p>
+          </div>
           <Elements stripe={stripePromise} options={{ clientSecret }}>
-            <PaymentForm clientSecret={clientSecret} onSuccess={() => setPaid(true)} />
+            <PaymentForm onSuccess={() => setPaid(true)} />
           </Elements>
         </div>
       )}

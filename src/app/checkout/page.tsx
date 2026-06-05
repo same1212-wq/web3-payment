@@ -105,15 +105,8 @@ export default function CheckoutPage() {
       const data = await res.json();
 
       // レスポンス構造を柔軟に対応
-      const stripeKey =
-        data.payment?.stripePublishableKey ||
-        data.stripePublishableKey;
-
-      const secret =
-        data.payment?.preparation?.stripeClientSecret ||
-        data.payment?.clientSecret ||
-        data.clientSecret;
-
+      const stripeKey = data?.order?.payment?.preparation?.stripePublishableKey;
+      const secret = data?.order?.payment?.preparation?.stripeClientSecret;
       if (stripeKey && secret) {
         const stripe = loadStripe(stripeKey);
         setStripePromise(stripe);

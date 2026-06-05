@@ -101,7 +101,7 @@ export default function CheckoutPage() {
               {`Rate: 1 USDC = JPY ${rate?.toFixed(2)} (${updatedAt})`}
             </p>
           </div>
-          <CrossmintProvider apiKey={CLIENT_API_KEY}>
+          <p style={{color:"red", fontSize:"12px"}}>DEBUG: {toUsdc(selected.priceJPY)} USDC / rate: {rate}</p><CrossmintProvider apiKey={CLIENT_API_KEY}>
             <CrossmintHostedCheckout
               lineItems={{
                 collectionLocator: `crossmint:${COLLECTION_ID}`,

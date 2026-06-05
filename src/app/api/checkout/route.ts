@@ -6,9 +6,6 @@ const SERVER_KEY = process.env.CROSSMINT_SERVER_KEY!;
 // Polygon Amoy (Staging) の USDC トークンアドレス
 const USDC_TOKEN_LOCATOR = "polygon-amoy:0x41e94eb019c0762f9bfcf9fb1e58725bfb0e7582";
 
-// 受取ウォレットアドレス（クライアントのウォレット）
-const RECIPIENT_WALLET = process.env.NEXT_PUBLIC_SELLER_WALLET!;
-
 export async function POST(req: NextRequest) {
   const { totalPrice, recipientEmail } = await req.json();
 
@@ -34,7 +31,7 @@ export async function POST(req: NextRequest) {
         },
       ],
       recipient: {
-        walletAddress: RECIPIENT_WALLET,
+        email: recipientEmail,
       },
       locale: "ja-JP",
     }),
